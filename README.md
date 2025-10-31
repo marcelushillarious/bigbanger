@@ -29,7 +29,7 @@ This is not the first open-source Tindeq Progressor-like project. The [hangman](
 
 ## Prerequisite
 
-### Micropython version
+### Micropython
 
 * Python 3.7 or newer
 
@@ -37,9 +37,9 @@ This is not the first open-source Tindeq Progressor-like project. The [hangman](
 
 * [rshell](https://github.com/dhylands/rshell)
 
-### Rust version
+### Rust
 
-* Rust toolchain installation compatible with ESP32-C3. Please follow the steps outlined [here](https://docs.espressif.com/projects/rust/book/getting-started/toolchain.html)
+* Rust toolchain and tooling installation compatible with ESP32-C3. Please follow the steps outlined [here](https://docs.espressif.com/projects/rust/book/getting-started/toolchain.html)
 
 ## How-to Hardware
 
