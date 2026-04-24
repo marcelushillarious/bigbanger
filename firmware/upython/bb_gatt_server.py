@@ -18,15 +18,16 @@ from machine import Pin
 # User imports
 from config import *
 from utils import *
-from hx711_bb import *
+from ads1231_bb import *
 
 class BLEBigBanger:
-    def __init__(self, ble, dataPin, clkPin, tarePin, ledPin, name = 'Progressor_BB', device = 'WH-C07'):
+    def __init__(self, ble, data_pin, clk_pin, tare_pin, led_pin, oled=None, name = 'Progressor_BB', device = 'WH-C07'):
         # Set pins
-        self._dataPin = dataPin
-        self._clkPin = clkPin
-        self._tarePin = tarePin
-        self._ledPin = ledPin
+        self._data_pin = data_pin
+        self._clk_pin = clk_pin
+        self._tare_pin = tare_pin
+        self._led_pin = led_pin
+        self.oled = oled
         # Initialize BLE
         self._ble = ble
         self._ble.active(True)
@@ -40,8 +41,9 @@ class BLEBigBanger:
         self._sending_data = False
         self._tare = False
         self._advertise()
-        # Define HX711 driver
-        self.driver = HX711BB(clock = self._clkPin, data = self._dataPin, device = device)
+        # Define ADS1231 driver
+        self.driver = ADS1231BB(data_pin=self._data_pin, clk_pin=self._clk_pin, device=device)
+        self.driver.set_start_time(time.ticks_us())
         # Start the loops
         self.normal_mode_task = asyncio.create_task(self.send_data_loop())
         self.tare_mode_task = asyncio.create_task(self.tare_mode())
@@ -114,6 +116,7 @@ class BLEBigBanger:
     async def send_data_loop(self):
         """Send weight data over BLE"""
         while True:
+            self.driver.update()
             if self._sending_data:
                 # Get weight measurement
                 byte_array = self.driver.get_ble_pkt()
@@ -123,7 +126,13 @@ class BLEBigBanger:
             if self._tare:
                 self.driver.tare()
                 self._tare = False
-            await asyncio.sleep_ms(10)  # 100 Hz, Ok for 80 Hz of HX711
+            # Update display
+            if self.oled:
+                weight = self.driver.get_weight()
+                self.oled.fill(0)
+                self.oled.text(f"{weight:.1f} g", 0, 0)
+                self.oled.show()
+            await asyncio.sleep_ms(10)  # 100 Hz
 
     async def tare_mode(self):
         while True:

@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PlatformIO: Build",
+      "type": "shell",
+      "command": "pio run",
+      "group": "build",
+      "problemMatcher": ["$platformio"]
+    },
+    {
+      "label": "PlatformIO: Upload",
+      "type": "shell",
+      "command": "pio run -t upload",
+      "group": "build",
+      "problemMatcher": ["$platformio"]
+    },
+    {
+      "label": "MicroPython: Flash firmware",
+      "type": "shell",
+      "command": "esptool.py --chip esp32 --port ${input:serialPort} erase_flash && esptool.py --chip esp32 --port ${input:serialPort} --baud 460800 write_flash -z 0x1000 ${input:firmwareBin}",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "MicroPython: Upload Python files",
+      "type": "shell",
+      "command": "ampy --port ${input:serialPort} put main.py && ampy --port ${input:serialPort} put bb_gatt_server.py && ampy --port ${input:serialPort} put ads1231_bb.py && ampy --port ${input:serialPort} put config.py && ampy --port ${input:serialPort} put utils.py && ampy --port ${input:serialPort} put ble_advertising.py",
+      "group": "none",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "serialPort",
+      "type": "promptString",
+      "description": "Enter the serial port for your ESP32 (e.g. /dev/ttyUSB0 or /dev/tty.SLAB_USBtoUART)",
+      "default": "/dev/ttyUSB0"
+    },
+    {
+      "id": "firmwareBin",
+      "type": "promptString",
+      "description": "Enter the path to the MicroPython firmware binary",
+      "default": "esp32-20220618-v1.19.1.bin"
+    }
+  ]
+}

@@ -8,29 +8,35 @@ This file is part of an open-source project. Feel free to contribute or report i
 """
 
 import asyncio
-from machine import Pin
+from machine import Pin, I2C
+from ssd1306 import SSD1306_I2C
 
 # User imports
 from config import *
 from utils import *
-from hx711_bb import *
+from ads1231_bb import *
 from bb_gatt_server import *
 
 async def BigBanger(name = 'Progressor_BB', device = 'WH-C07'):
     # Define pins
-    dataPin = Pin(6, Pin.IN, pull=Pin.PULL_DOWN)
-    clkPin = Pin(5, Pin.OUT)
-    ledPin = Pin(4, Pin.OUT)
-    tarePin = Pin(9, Pin.IN)
+    data_pin = 21
+    clk_pin = 5
+    tare_pin = Pin(9, Pin.IN)
+    led_pin = Pin(4, Pin.OUT)
+    
+    # I2C for display
+    i2c = I2C(0, scl=Pin(23), sda=Pin(22))
+    oled = SSD1306_I2C(128, 32, i2c)
 
     # BLE
     ble = bluetooth.BLE()
     p = BLEBigBanger(
         ble,
-        dataPin = dataPin,
-        clkPin = clkPin,
-        tarePin = tarePin,
-        ledPin = ledPin,
+        data_pin = data_pin,
+        clk_pin = clk_pin,
+        tare_pin = tare_pin,
+        led_pin = led_pin,
+        oled = oled,
         name = name,
         device = device)
 
